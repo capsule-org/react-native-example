@@ -7,7 +7,7 @@
 ### Step 1: Install app dependecies
 
 ```bash
-yarn && cd ios && pod install
+yarn && yarn pod-install
 ```
 
 ### Step 2: Add your API key
