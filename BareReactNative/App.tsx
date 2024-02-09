@@ -25,6 +25,8 @@ function App(): React.JSX.Element {
     const init = async () => {
       try {
         setIsInitializing(true);
+
+        // Initialize Capsule before proceeding to the app
         await capsule.init();
 
         if (await capsule.isSessionActive()) {
