@@ -4,6 +4,8 @@
 
 > **Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
 
+> **Note**: If using NVM (or another version manager for Node), please refer to [this step](https://reactnative.dev/docs/environment-setup#optional-configuring-your-environment) for properly configuring your Xcode environment
+
 ### Step 1: Install app dependecies
 
 ```bash
