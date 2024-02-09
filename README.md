@@ -1,1 +1,1 @@
-# react-native-examples
+# Capsule React Native Example Apps
