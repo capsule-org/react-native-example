@@ -1,4 +1,4 @@
-# Capsule Bare React Native Example (0.72)
+# Capsule React Native v0.72 Example
 
 ## Getting Started
 

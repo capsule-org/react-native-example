@@ -47,7 +47,7 @@ function App(): JSX.Element {
       <SafeAreaView style={{flex: 1}}>
         <View style={{backgroundColor: 'black', flex: 1, padding: 24}}>
           <Text style={{textAlign: 'center', color: 'white', fontSize: 24}}>
-            Capsule{'\n'}React Native Sample App
+            Capsule{'\n'}React Native Sample App{'\n'}v0.70
           </Text>
           {isLoading ? (
             <View style={{flex: 1, justifyContent: 'center'}}>
