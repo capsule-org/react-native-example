@@ -2,6 +2,6 @@
 
 Follow the instructions in the README for the respective example to get started.
 
-## [v0.73](./v0.73)
+## [React Native v0.73](./react-native-v0.73)
 
-## [v0.70](./v0.70)
+## [React Native v0.70](./react-native-v0.70)
