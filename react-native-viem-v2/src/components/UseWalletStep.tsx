@@ -174,6 +174,21 @@ export const UseWalletStep = ({onLogout}: UseWalletStepProps) => {
                 </Text>
                 <Text style={{color: 'white', fontSize: 16}}>{txHash}</Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  Clipboard.setString(
+                    `https://sepolia.etherscan.io/tx/${txHash}`,
+                  );
+                }}>
+                <Text style={{color: 'white', fontSize: 16, paddingTop: 16}}>
+                  Sepolia Scan Link:
+                </Text>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontSize: 16,
+                  }}>{`https://sepolia.etherscan.io/tx/${txHash}`}</Text>
+              </TouchableOpacity>
             </>
           )}
         </ScrollView>

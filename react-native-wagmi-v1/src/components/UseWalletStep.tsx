@@ -4,29 +4,56 @@ import Toast from 'react-native-toast-message';
 import {capsule} from '../clients/capsule';
 import {Button} from './Button';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {CapsuleEthersSigner} from '@usecapsule/react-native-wallet';
-import {ethers, Provider} from 'ethers';
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  usePrepareSendTransaction,
+  useSendTransaction,
+  useWaitForTransaction,
+} from 'wagmi';
 
 interface UseWalletStepProps {
   onLogout: () => void;
 }
 
-const ALCHEMY_SEPOLIA_PROVIDER =
-  'https://eth-sepolia.g.alchemy.com/v2/KfxK8ZFXw9mTUuJ7jt751xGJCa3r8noZ';
-
-const provider = new ethers.JsonRpcProvider(
-  ALCHEMY_SEPOLIA_PROVIDER,
-  'sepolia',
-);
-
 const DEFAULT_TO_ADDRESS = '0x42c9a72c9dfcc92cae0de9510160cea2da27af91';
+const DEFAULT_CHAIN_ID = '11155111';
 
 export const UseWalletStep = ({onLogout}: UseWalletStepProps) => {
+  const {address: walletAddress, isConnected} = useAccount();
+  const {connect, connectors, isLoading, pendingConnector} = useConnect();
+  const {disconnect} = useDisconnect();
+
+  const {config} = usePrepareSendTransaction({
+    to: DEFAULT_TO_ADDRESS,
+    value: BigInt(10100000000),
+    chainId: Number(DEFAULT_CHAIN_ID),
+    type: 'eip1559',
+  });
+
+  const {
+    data,
+    sendTransaction,
+    isLoading: isSendTxLoading,
+  } = useSendTransaction({
+    ...config,
+    onSuccess: () => {
+      Toast.show({type: 'success', text1: '🔥 TX sent successfully! 🔥'});
+    },
+    onError: e => {
+      console.error('TX Send Error: ', e);
+      Toast.show({type: 'error', text1: 'TX sending failed.'});
+    },
+  });
+
+  const {isSuccess} = useWaitForTransaction({
+    hash: data?.hash,
+    confirmations: 0,
+  });
+
   const [walletId, setWalletId] = useState('');
-  const [walletAddress, setWalletAddress] = useState('');
   const [email, setEmail] = useState('');
-  const [txHash, setTXHash] = useState('');
-  const [isSending, setIsSending] = useState(false);
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
 
   const fetchAndSetWallet = () => {
@@ -35,7 +62,6 @@ export const UseWalletStep = ({onLogout}: UseWalletStepProps) => {
     const firstWalletId = Object.keys(allWallets)[0];
 
     setWalletId(firstWalletId);
-    setWalletAddress(allWallets[firstWalletId]?.address ?? '');
   };
 
   // Get wallet & email
@@ -73,6 +99,7 @@ export const UseWalletStep = ({onLogout}: UseWalletStepProps) => {
         {
           text: 'Logout',
           onPress: async () => {
+            disconnect();
             // Log the user out
             await capsule.logout();
 
@@ -86,34 +113,8 @@ export const UseWalletStep = ({onLogout}: UseWalletStepProps) => {
     );
   };
 
-  const handleSendEthersTX = async () => {
-    try {
-      setIsSending(true);
-
-      const tx = {
-        from: walletAddress,
-        to: DEFAULT_TO_ADDRESS,
-        value: 10101010000000,
-        gasLimit: 21000,
-        maxPriorityFeePerGas: 1000000000,
-        maxFeePerGas: 3000000000,
-        nonce: await provider.getTransactionCount(walletAddress),
-        chainId: '11155111',
-        type: 2,
-      };
-
-      const ethersSigner = new CapsuleEthersSigner(capsule, provider as any);
-
-      const resp = await ethersSigner.sendTransaction(tx);
-
-      setTXHash(resp.hash);
-      Toast.show({type: 'success', text1: '🔥 TX sent successfully! 🔥'});
-    } catch (e) {
-      console.error('TX Send Error: ', e);
-      Toast.show({type: 'error', text1: 'TX sending failed.'});
-    } finally {
-      setIsSending(false);
-    }
+  const handleSendTx = () => {
+    sendTransaction?.();
   };
 
   return (
@@ -136,45 +137,63 @@ export const UseWalletStep = ({onLogout}: UseWalletStepProps) => {
             <Text style={{color: 'white', fontSize: 16}}>Email:</Text>
             <Text style={{color: 'white', fontSize: 16}}>{email}</Text>
           </TouchableOpacity>
-          {walletId && (
+          {isConnected ? (
             <>
-              <TouchableOpacity
-                onPress={() => {
-                  Clipboard.setString(walletId);
-                }}>
-                <Text style={{color: 'white', fontSize: 16, paddingTop: 16}}>
-                  Wallet ID:
-                </Text>
-                <Text style={{color: 'white', fontSize: 16}}>{walletId}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  Clipboard.setString(walletAddress);
-                }}>
-                <Text style={{color: 'white', fontSize: 16, paddingTop: 16}}>
-                  Wallet Address:
-                </Text>
-                <Text style={{color: 'white', fontSize: 16}}>
-                  {walletAddress}
-                </Text>
-              </TouchableOpacity>
+              {walletId && (
+                <>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Clipboard.setString(walletId);
+                    }}>
+                    <Text
+                      style={{color: 'white', fontSize: 16, paddingTop: 16}}>
+                      Wallet ID:
+                    </Text>
+                    <Text style={{color: 'white', fontSize: 16}}>
+                      {walletId}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Clipboard.setString(walletAddress ?? '');
+                    }}>
+                    <Text
+                      style={{color: 'white', fontSize: 16, paddingTop: 16}}>
+                      Wallet Address:
+                    </Text>
+                    <Text style={{color: 'white', fontSize: 16}}>
+                      {walletAddress}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </>
+          ) : (
+            <Text
+              style={{
+                color: 'red',
+                fontSize: 16,
+                paddingTop: 16,
+                textAlign: 'center',
+              }}>
+              Not Connected
+            </Text>
           )}
-          {txHash && (
+          {isSuccess && (
             <>
               <TouchableOpacity
                 onPress={() => {
-                  Clipboard.setString(txHash);
+                  Clipboard.setString(data?.hash ?? '');
                 }}>
                 <Text style={{color: 'white', fontSize: 16, paddingTop: 16}}>
                   TX Hash:
                 </Text>
-                <Text style={{color: 'white', fontSize: 16}}>{txHash}</Text>
+                <Text style={{color: 'white', fontSize: 16}}>{data?.hash}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   Clipboard.setString(
-                    `https://sepolia.etherscan.io/tx/${txHash}`,
+                    `https://sepolia.etherscan.io/tx/${data?.hash}`,
                   );
                 }}>
                 <Text style={{color: 'white', fontSize: 16, paddingTop: 16}}>
@@ -184,13 +203,27 @@ export const UseWalletStep = ({onLogout}: UseWalletStepProps) => {
                   style={{
                     color: 'white',
                     fontSize: 16,
-                  }}>{`https://sepolia.etherscan.io/tx/${txHash}`}</Text>
+                  }}>{`https://sepolia.etherscan.io/tx/${data?.hash}`}</Text>
               </TouchableOpacity>
             </>
           )}
         </ScrollView>
         <View style={{justifyContent: 'flex-end', gap: 16}}>
-          {!walletId ? (
+          {!isConnected ? (
+            <>
+              {connectors.map(conn => (
+                <Button
+                  title={`Connect To ${conn.name}${
+                    !conn.ready ? ' (unsupported)' : ''
+                  }`}
+                  isDisabled={!conn.ready}
+                  isLoading={isLoading && conn.id === pendingConnector?.id}
+                  key={conn.id}
+                  onPress={() => connect({connector: conn})}
+                />
+              ))}
+            </>
+          ) : !walletId ? (
             <Button
               onPress={handleCreateWallet}
               title="Create Wallet"
@@ -198,9 +231,9 @@ export const UseWalletStep = ({onLogout}: UseWalletStepProps) => {
             />
           ) : (
             <Button
-              onPress={handleSendEthersTX}
-              title="Send TX With Ethers"
-              isLoading={isSending}
+              onPress={handleSendTx}
+              title="Send TX With Wagmi"
+              isLoading={isSendTxLoading}
             />
           )}
           <Button onPress={handleLogout} title="Logout" />
