@@ -1,44 +1,38 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Capsule React Native - Wagmi v1 Example
 
-# Getting Started
-
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
-
-## Step 1: Start the Metro Server
-
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
-
-To start Metro, run the following command from the _root_ of your React Native project:
+This example uses `react-native` v0.73, but can be plugged in to any of the other react native example versions, just add `wagmi` to any of the other examples using the following command.
 
 ```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
+yarn add wagmi
 ```
 
-## Step 2: Start your Application
+## Getting Started
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+> **Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
 
-### For Android
+> **Note**: If using NVM (or another version manager for Node), please refer to [this step](https://reactnative.dev/docs/environment-setup#optional-configuring-your-environment) for properly configuring your Xcode environment
+
+### Step 1: Install app dependecies
 
 ```bash
-# using npm
-npm run android
+yarn && yarn pod-install
+```
 
-# OR using Yarn
+### Step 2: Add your API key
+
+Replace `YOUR_API_KEY` in `./src/clients/capsule.ts` with your valid API key.
+
+### Step 3: Start your Application
+
+#### For Android
+
+```bash
 yarn android
 ```
 
-### For iOS
+#### For iOS
 
 ```bash
-# using npm
-npm run ios
-
-# OR using Yarn
 yarn ios
 ```
 
@@ -46,29 +40,11 @@ If everything is set up _correctly_, you should see your new app running in your
 
 This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
 
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
+## Troubleshooting
 
 If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
 
-# Learn More
+## Learn More
 
 To learn more about React Native, take a look at the following resources:
 
